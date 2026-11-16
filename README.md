@@ -79,6 +79,7 @@ Common edits are single keys. Everything else sits behind `\` (Vim's default `<L
 | `o` / `O` | Cycle sort / reverse | `f` / `F` | Filter / clear |
 | `H` | Hide done | `T` | Timeline |
 | `zw` | Wide columns (full text, scroll with `zl` `zh`) | | |
+| `\m` | Move a column (pick it, then where it goes) | | |
 | `za` `zM` `zR` | Fold groups | `u` | Undo last change |
 | `yy` `yu` `yb` | Copy key / URL / branch name | | |
 
@@ -235,6 +236,7 @@ require('jira').setup({
   stale_days = 5,
   due_soon_days = 3,
   hide_done = false,
+  columns = { tasks = { 'key', 'summary', 'status', 'assignee', 'due' } }, -- grid columns in order (`\m` moves one until you quit)
   prefix = '\\',                             -- for \f, \x, \w, … ('<prefix>' in keymaps below)
   keymaps = { grid = { move_down = '<C-j>', move_up = '<C-k>' } }, -- false disables a key
   offline_cache = true,                      -- show the last lists at once, refresh in the background

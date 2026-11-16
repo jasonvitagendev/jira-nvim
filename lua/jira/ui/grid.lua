@@ -220,15 +220,52 @@ local function rows_are_parents(st)
   return st.view.kind == 'epics' or st.child_parents
 end
 
-local function columns_for(st, rows)
-  local list = vim.deepcopy(config.columns[rows_are_parents(st) and 'epics' or 'tasks'])
-  if (st.view.kind == 'tasks' or st.view.kind == 'sprint') and not vim.tbl_contains(list, 'parent') then
+local order = {} -- 'tasks' | 'epics' -> column names, once a column was moved (this session)
+local order_rev = 0
+
+-- Lists that mix epics get an Epic column.
+local function mixed(st)
+  return st.view.kind == 'tasks' or st.view.kind == 'sprint'
+end
+
+local function all_columns(st)
+  local kind = rows_are_parents(st) and 'epics' or 'tasks'
+  local list = vim.deepcopy(order[kind] or config.columns[kind])
+  if mixed(st) and not vim.tbl_contains(list, 'parent') then
     list[#list + 1] = 'parent'
   end
+  return list, kind
+end
+
+local function columns_for(st, rows)
+  local list, kind = all_columns(st)
+  -- a moved Epic column keeps its place in the order, but only shows where it did before
+  local epic_col = mixed(st) or vim.tbl_contains(config.columns[kind], 'parent')
   return vim.tbl_filter(function(name)
     local c = COLUMNS[name]
-    return c and (not c.show or c.show(rows))
+    return c and (name ~= 'parent' or epic_col) and (not c.show or c.show(rows))
   end, list)
+end
+
+-- list with name moved to just after `after` (nil = first)
+local function place(list, name, after)
+  local out = vim.tbl_filter(function(n)
+    return n ~= name
+  end, list)
+  local at = 0
+  for i, n in ipairs(out) do
+    if n == after then
+      at = i
+    end
+  end
+  table.insert(out, at + 1, name)
+  return out
+end
+
+-- "Status", or "Pts (points)" when the title is short for the config name
+local function column_label(name)
+  local title = COLUMNS[name].title
+  return title:lower() == name and title or ('%s (%s)'):format(title, name)
 end
 
 -- data ----------------------------------------------------------------------
@@ -448,6 +485,7 @@ local function draw(st)
 
   local rows = visible(st)
   local cols = columns_for(st, rows)
+  st.cols, st.order_rev = cols, order_rev
   local widths, fixed = {}, 0
   for _, name in ipairs(cols) do
     local c = COLUMNS[name]
@@ -832,6 +870,41 @@ local function fold(st, which, all)
   draw(st)
 end
 
+-- Ask which column to move and where to. The new order applies to every grid with the same kind of rows.
+local function move_column(st)
+  local cols = st.cols or {}
+  local full, kind = all_columns(st)
+  local labels = vim.tbl_map(column_label, cols)
+  if order[kind] then
+    labels[#labels + 1] = 'Reset to the configured order'
+  end
+  local function apply(list)
+    order[kind] = list
+    order_rev = order_rev + 1
+    draw(st)
+  end
+  vim.ui.select(labels, { prompt = 'Move column' }, function(_, idx)
+    local name = cols[idx]
+    if not idx then
+      return
+    elseif not name then
+      return apply(nil)
+    end
+    local others, places = {}, { 'First' }
+    for _, n in ipairs(cols) do
+      if n ~= name then
+        others[#others + 1] = n
+        places[#places + 1] = 'After ' .. column_label(n)
+      end
+    end
+    vim.ui.select(places, { prompt = 'Put ' .. column_label(name) }, function(_, at)
+      if at then
+        apply(place(full, name, others[at - 1]))
+      end
+    end)
+  end)
+end
+
 -- Float with the description of the issue under the cursor.
 local function peek(st)
   local it = current(st)
@@ -1109,6 +1182,9 @@ function M.open(view, win)
         vim.fn.winrestview({ leftcol = 0 })
       end
     end,
+    move_column = function()
+      move_column(st)
+    end,
     browser = act('browser'),
     yank_key = act('yank_key'),
     yank_url = act('yank_url'),
@@ -1141,6 +1217,8 @@ function M.open(view, win)
     callback = function()
       if st.version and st.version ~= store.version and not st.loading then
         M.load(st)
+      elseif st.order_rev ~= order_rev then
+        draw(st)
       else
         M.winbar(st)
       end
@@ -1162,5 +1240,6 @@ end
 -- for tests
 M._draw = draw
 M._visible = visible
+M._place = place
 
 return M

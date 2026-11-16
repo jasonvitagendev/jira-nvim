@@ -84,6 +84,7 @@ M.defs = {
     { 'clear_filter', 'F', 'Clear filter', 'View' },
     { 'hide_done', 'H', 'Hide / show done', 'View' },
     { 'wide', 'zw', 'Wide columns: show full text, scroll sideways', 'View' },
+    { 'move_column', '<prefix>m', 'Move a column (until you quit)', 'View' },
     { 'browser', '<prefix>x', 'Open in browser', 'Other' },
     { 'yank_key', 'yy', 'Copy key', 'Other' },
     { 'yank_url', 'yu', 'Copy URL', 'Other' },

@@ -117,6 +117,12 @@ eq('epoch no zone', dates.epoch('2026-03-30T13:00:00'), nil)
 local stripped = require('jira.cache').strip({ { key = 'P-1', summary = 's', description = 'secret', raw = { x = 1 }, progress = { total = 1 } } })
 eq('cache strip', stripped, { { key = 'P-1', summary = 's', progress = { total = 1 } } })
 
+-- grid column order -------------------------------------------------------------------
+local place = require('jira.ui.grid')._place
+eq('column after another', place({ 'key', 'summary', 'assignee', 'status' }, 'status', 'summary'), { 'key', 'summary', 'status', 'assignee' })
+eq('column to the right', place({ 'key', 'summary', 'status' }, 'key', 'status'), { 'summary', 'status', 'key' })
+eq('column first', place({ 'key', 'summary', 'status' }, 'status', nil), { 'status', 'key', 'summary' })
+
 -- digest ----------------------------------------------------------------------------
 local digest = require('jira.ui.digest')
 local epic = { key = 'P-1', summary = 'Dublin', status = 'In Progress', cat = 'indeterminate', due = '2026-11-20', progress = { total = 4, done = 2, new = 1, indeterminate = 1 } }
