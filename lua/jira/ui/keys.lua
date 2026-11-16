@@ -14,6 +14,7 @@ M.defs = {
     { 'search', '/', 'Search epics (text or JQL)', 'Navigate' },
     { 'find', '<prefix>f', 'Fuzzy find any issue', 'Navigate' },
     { 'go_key', '<prefix>i', 'Open issue by key', 'Navigate' },
+    { 'sidebar_toggle', '<prefix>b', 'Hide sidebar', 'Navigate' },
     { 'timeline', 'T', 'Timeline of this section', 'Navigate' },
     { 'sprint_view', '<prefix>s', 'Active sprint of a project', 'Navigate' },
     { 'digest', '<prefix>d', 'Weekly digest of your epics', 'Navigate' },
@@ -41,6 +42,7 @@ M.defs = {
     { 'peek', 'p', 'Peek description in a float', 'Navigate' },
     { 'back', '<BS>', 'Back', 'Navigate' },
     { 'sidebar', '<C-h>', 'Focus sidebar', 'Navigate' },
+    { 'sidebar_toggle', '<prefix>b', 'Hide / show sidebar', 'Navigate' },
     { 'find', '<prefix>f', 'Fuzzy find any issue', 'Navigate' },
     { 'timeline', 'T', 'Timeline of these rows', 'Navigate' },
     { 'changes', '<prefix>c', 'What changed since yesterday', 'Navigate' },
@@ -93,6 +95,7 @@ M.defs = {
     { 'open', '<CR>', 'Open linked issue, web link or parent under cursor', 'Navigate' },
     { 'back', '<BS>', 'Back', 'Navigate' },
     { 'parent', '<prefix>p', 'Go to parent', 'Navigate' },
+    { 'sidebar_toggle', '<prefix>b', 'Hide / show sidebar', 'Navigate' },
     { 'next_section', ']]', 'Next section / comment', 'Navigate' },
     { 'prev_section', '[[', 'Previous section / comment', 'Navigate' },
     -- native folds, listed for help only (no handler, so no mapping)
@@ -128,6 +131,7 @@ M.defs = {
   timeline = {
     { 'open', '<CR>', 'Open', 'Navigate' },
     { 'back', { '<BS>', 'T' }, 'Back to the grid', 'Navigate' },
+    { 'sidebar_toggle', '<prefix>b', 'Hide / show sidebar', 'Navigate' },
     { 'status', 's', 'Change status', 'Edit' },
     { 'start', 'ds', 'Set start date', 'Edit' },
     { 'due', 'dd', 'Set due date', 'Edit' },
@@ -142,6 +146,7 @@ M.defs = {
     { 'back', '<BS>', 'Back', 'Navigate' },
     { 'earlier', '-', 'One day further back', 'View' },
     { 'later', '+', 'One day less', 'View' },
+    { 'sidebar_toggle', '<prefix>b', 'Hide / show sidebar', 'View' },
     { 'refresh', 'r', 'Refresh', 'Other' },
     { 'help', '?', 'Help', 'Other' },
     { 'close', 'q', 'Close Jira', 'Other' },
@@ -151,6 +156,7 @@ M.defs = {
     { 'back', '<BS>', 'Back', 'Navigate' },
     { 'earlier', '-', 'One day further back', 'View' },
     { 'later', '+', 'One day less', 'View' },
+    { 'sidebar_toggle', '<prefix>b', 'Hide / show sidebar', 'View' },
     { 'copy', 'Y', 'Copy the digest (markdown)', 'Other' },
     { 'browser', '<prefix>x', 'Open the issue under the cursor in browser', 'Other' },
     { 'refresh', 'r', 'Refresh', 'Other' },
@@ -182,9 +188,16 @@ local function key_for(scope, def)
   return #list > 0 and table.concat(list, ' ') or nil
 end
 
+-- Actions that behave the same in every window.
+local shared = {
+  sidebar_toggle = function()
+    require('jira.ui.layout').toggle_sidebar()
+  end,
+}
+
 function M.apply(buf, scope, handlers)
   for _, def in ipairs(M.defs[scope]) do
-    local fn = handlers[def[1]]
+    local fn = handlers[def[1]] or shared[def[1]]
     for _, lhs in ipairs(fn and keys_for(scope, def) or {}) do
       -- defs flagged for selections are mapped in visual mode too; the handler reads the range itself
       vim.keymap.set(def[5] and { 'n', 'x' } or 'n', lhs, fn, { buffer = buf, nowait = #lhs == 1, silent = true, desc = 'jira: ' .. (def[3] or def[1]) })

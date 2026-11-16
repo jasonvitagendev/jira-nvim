@@ -263,6 +263,9 @@ M.commands = {
   digest = function(args)
     require('jira.ui.layout').show_digest(tonumber(args[1]))
   end,
+  sidebar = function()
+    require('jira.ui.layout').toggle_sidebar()
+  end,
   login = function()
     a.run(function()
       require('jira.auth').login()

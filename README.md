@@ -42,6 +42,7 @@ Then `:Jira login` once. A browser tab opens, you approve, and you're done. Afte
 | `:Jira mine` | Your open tasks across all projects |
 | `:Jira view <name>` | Open a configured view |
 | `:Jira sprint [PROJ]` | The active sprint of a project, grouped by status |
+| `:Jira sidebar` | Hide or show the sidebar (`\b` in any Jira window) |
 | `:Jira digest [days]` | What happened in your epics this week, ready to paste |
 | `:Jira timeline [PROJ-12 or view]` | Timeline of an epic's tasks, an initiative's epics, or a view |
 | `:Jira changes PROJ-12` | What changed in an epic and its tasks since yesterday |
@@ -87,6 +88,7 @@ Common edits are single keys. Everything else sits behind `\` (Vim's default `<L
 | `\g` | Group by status / assignee | `\c` | What changed |
 | `\s` | Sprint view | `\d` | Weekly digest |
 | `\f` | Find any issue | `\x` | Open in browser |
+| `\b` | Hide / show sidebar | `<C-h>` | Focus sidebar (shows it if hidden) |
 
 - **Several rows at once:** select rows with `V`, then press `s`, `m`, `@`, `!`, `#`, `L`, `E`, `ds`, `dd`, `\S`, `\l` or `\w`. You're asked once and the change goes to every row. With dates, `++1w` pushes each row out from its own date.
 - **Epic header:** on the lines at the top of the grid, `ds`, `dd`, `s`, `e` and `c` apply to the epic itself.

@@ -14,7 +14,7 @@ vim.api.nvim_create_user_command('Jira', function(opts)
   require('jira').command(opts)
 end, {
   nargs = '*',
-  desc = 'Jira: open, branch, find, search, mine, view, sprint, digest, timeline, changes, new, epic, initiative, create, plan, start, log, comment, undo, login, logout, status',
+  desc = 'Jira: open, branch, find, search, mine, view, sprint, digest, sidebar, timeline, changes, new, epic, initiative, create, plan, start, log, comment, undo, login, logout, status',
   complete = function(arglead, line)
     return require('jira').complete(arglead, line)
   end,

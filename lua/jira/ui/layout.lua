@@ -6,7 +6,8 @@
 --   └──────────────┴────────────────────────────────┘
 local config = require('jira.config')
 
-local M = { tab = nil, side = nil, main = nil }
+-- collapsed: the sidebar was hidden on purpose, so views opening in main don't bring it back
+local M = { tab = nil, side = nil, main = nil, collapsed = false }
 
 local function valid(win)
   return win and vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_tabpage(win) == M.tab
@@ -36,17 +37,21 @@ local function ensure()
     return true
   end
   vim.api.nvim_set_current_tabpage(M.tab)
-  if not valid(M.side) then
+  if not valid(M.side) and not M.collapsed then
     vim.cmd('topleft vsplit')
     M.side = vim.api.nvim_get_current_win()
     vim.api.nvim_win_set_width(M.side, config.sidebar_width)
     require('jira.ui.sidebar').open_in(M.side)
   end
   if not valid(M.main) then
-    vim.api.nvim_set_current_win(M.side)
-    vim.cmd('rightbelow vsplit')
-    M.main = vim.api.nvim_get_current_win()
-    vim.api.nvim_win_set_width(M.side, config.sidebar_width)
+    if valid(M.side) then
+      vim.api.nvim_set_current_win(M.side)
+      vim.cmd('rightbelow vsplit')
+      M.main = vim.api.nvim_get_current_win()
+      vim.api.nvim_win_set_width(M.side, config.sidebar_width)
+    else
+      M.main = vim.api.nvim_get_current_win()
+    end
   end
   return false
 end
@@ -131,8 +136,29 @@ function M.show_digest(days)
 end
 
 function M.focus_sidebar()
+  if M.collapsed then
+    M.collapsed = false
+    ensure()
+  end
   if valid(M.side) then
     vim.api.nvim_set_current_win(M.side)
+  end
+end
+
+-- Hide the sidebar so the grid gets the full width, or bring it back. Focus stays in main.
+function M.toggle_sidebar()
+  if not (M.is_open() and vim.api.nvim_get_current_tabpage() == M.tab) then
+    return M.open()
+  end
+  if valid(M.side) and valid(M.main) then
+    M.collapsed = true
+    vim.api.nvim_win_close(M.side, false)
+  else
+    M.collapsed = false
+    ensure()
+  end
+  if valid(M.main) then
+    vim.api.nvim_set_current_win(M.main)
   end
 end
 
@@ -147,7 +173,7 @@ function M.close()
     vim.cmd('enew')
     vim.cmd('only')
   end
-  M.tab, M.side, M.main = nil, nil, nil
+  M.tab, M.side, M.main, M.collapsed = nil, nil, nil, false
 end
 
 return M
