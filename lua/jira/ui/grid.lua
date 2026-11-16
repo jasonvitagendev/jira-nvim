@@ -286,7 +286,9 @@ local function visible(st)
     end
   end
   local s = st.sort
-  if s ~= 'rank' then
+  -- status sort already puts done last
+  local sink = config.done_last and s ~= 'status'
+  if s ~= 'rank' or sink or st.reverse then
     local function k(it)
       if s == 'status' then
         return ('%d%s'):format(CAT_ORDER[it.cat] or 9, it.status)
@@ -302,6 +304,13 @@ local function visible(st)
       return ''
     end
     table.sort(out, function(x, y)
+      if sink and (x.cat == 'done') ~= (y.cat == 'done') then
+        return y.cat == 'done'
+      end
+      -- reverse within the open and done blocks, so done stays at the bottom
+      if st.reverse then
+        x, y = y, x
+      end
       local kx, ky = k(x), k(y)
       if kx == ky then
         return x._rank < y._rank
@@ -311,12 +320,6 @@ local function visible(st)
       end
       return kx < ky
     end)
-  end
-  if st.reverse then
-    local n = #out
-    for i = 1, math.floor(n / 2) do
-      out[i], out[n - i + 1] = out[n - i + 1], out[i]
-    end
   end
   return out
 end
@@ -810,7 +813,8 @@ local function move(st, dir)
     end
   end
   local other = rows[idx + dir]
-  if not other then
+  -- with done_last, open and done rows are drawn apart, so ranking across them would not show
+  if not other or (config.done_last and (it.cat == 'done') ~= (other.cat == 'done')) then
     return
   end
   -- optimistic local reorder

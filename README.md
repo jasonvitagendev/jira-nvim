@@ -236,6 +236,7 @@ require('jira').setup({
   stale_days = 5,
   due_soon_days = 3,
   hide_done = false,
+  done_last = true,                          -- done rows at the bottom, open rows keep the sort (false = Jira rank only)
   columns = { tasks = { 'key', 'summary', 'status', 'assignee', 'due' } }, -- grid columns in order (`\m` moves one until you quit)
   prefix = '\\',                             -- for \f, \x, \w, … ('<prefix>' in keymaps below)
   keymaps = { grid = { move_down = '<C-j>', move_up = '<C-k>' } }, -- false disables a key

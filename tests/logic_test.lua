@@ -123,6 +123,28 @@ eq('column after another', place({ 'key', 'summary', 'assignee', 'status' }, 'st
 eq('column to the right', place({ 'key', 'summary', 'status' }, 'key', 'status'), { 'summary', 'status', 'key' })
 eq('column first', place({ 'key', 'summary', 'status' }, 'status', nil), { 'status', 'key', 'summary' })
 
+-- done rows sink -------------------------------------------------------------------------
+local visible = require('jira.ui.grid')._visible
+local function keys_of(st)
+  return vim.tbl_map(function(it)
+    return it.key
+  end, visible(st))
+end
+local rows = {
+  { key = 'A', cat = 'done', status = 'Done', priority = 'High' },
+  { key = 'B', cat = 'new', status = 'To Do', priority = 'Low' },
+  { key = 'C', cat = 'indeterminate', status = 'In Progress', priority = 'High' },
+  { key = 'D', cat = 'new', status = 'To Do', priority = 'Medium' },
+}
+local view = { kind = 'tasks' }
+eq('done last keeps rank', keys_of({ items = rows, view = view, sort = 'rank' }), { 'B', 'C', 'D', 'A' })
+eq('done last by priority', keys_of({ items = rows, view = view, sort = 'priority' }), { 'C', 'D', 'B', 'A' })
+eq('done last reversed', keys_of({ items = rows, view = view, sort = 'rank', reverse = true }), { 'D', 'C', 'B', 'A' })
+require('jira.config').options.done_last = false
+eq('rank only', keys_of({ items = rows, view = view, sort = 'rank' }), { 'A', 'B', 'C', 'D' })
+eq('rank only reversed', keys_of({ items = rows, view = view, sort = 'rank', reverse = true }), { 'D', 'C', 'B', 'A' })
+require('jira.config').options.done_last = true
+
 -- digest ----------------------------------------------------------------------------
 local digest = require('jira.ui.digest')
 local epic = { key = 'P-1', summary = 'Dublin', status = 'In Progress', cat = 'indeterminate', due = '2026-11-20', progress = { total = 4, done = 2, new = 1, indeterminate = 1 } }

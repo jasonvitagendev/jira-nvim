@@ -29,6 +29,8 @@ M.defaults = {
   -- An in-progress task with no update for this many days is flagged as stale.
   stale_days = 5,
   hide_done = false,
+  -- Done rows go to the bottom of the grid, below the open ones, whatever the sort.
+  done_last = true,
   -- Grid columns show their full text (the window scrolls sideways) instead of fitting the window. Toggle with zw.
   wide_columns = false,
   max_results = 300,
