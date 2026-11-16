@@ -29,6 +29,8 @@ M.defaults = {
   -- An in-progress task with no update for this many days is flagged as stale.
   stale_days = 5,
   hide_done = false,
+  -- Grid columns show their full text (the window scrolls sideways) instead of fitting the window. Toggle with zw.
+  wide_columns = false,
   max_results = 300,
   sidebar_width = 44,
   -- Issue finder (gf, :Jira find): 'auto' uses Snacks when installed, 'select' always uses vim.ui.select.

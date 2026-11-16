@@ -457,7 +457,9 @@ local function draw(st)
       for _, it in ipairs(rows) do
         w = math.max(w, r.width(c.get(it)))
       end
-      w = math.min(w, c.max or 99)
+      if not st.wide then
+        w = math.min(w, c.max or 99)
+      end
     end
     widths[name] = w
     if not c.flex then
@@ -470,8 +472,9 @@ local function draw(st)
   for _, it in ipairs(rows) do
     longest = math.max(longest, r.width(it.summary))
   end
-  -- at least 30 wide: on a narrow window the last columns scroll off rather than the titles
-  widths.summary = math.max(math.min(30, longest), math.min(longest, st.width - fixed - 4 - 2))
+  -- at least 30 wide: on a narrow window the last columns scroll off rather than the titles.
+  -- Wide mode shows every summary in full and the window scrolls sideways instead.
+  widths.summary = st.wide and longest or math.max(math.min(30, longest), math.min(longest, st.width - fixed - 4 - 2))
   local inner = #cols - 1
   for _, name in ipairs(cols) do
     inner = inner + widths[name] + 2
@@ -608,6 +611,9 @@ function M.winbar(st)
   end
   if st.hide_done then
     parts[#parts + 1] = '%#JiraSoon# · done hidden'
+  end
+  if st.wide then
+    parts[#parts + 1] = '%#JiraSoon# · wide (zl zh scroll)'
   end
   parts[#parts + 1] = '%=%#JiraHint#V select rows · ? help '
   vim.wo[win].winbar = table.concat(parts)
@@ -906,6 +912,7 @@ function M.open(view, win)
     sort = 'rank',
     group = view.group or 'none',
     hide_done = config.hide_done,
+    wide = config.wide_columns,
     back = prev,
   }
   local saved = cache_id(view) and cache.get(cache_id(view))
@@ -1094,6 +1101,13 @@ function M.open(view, win)
     hide_done = function()
       st.hide_done = not st.hide_done
       draw(st)
+    end,
+    wide = function()
+      st.wide = not st.wide
+      draw(st)
+      if not st.wide then
+        vim.fn.winrestview({ leftcol = 0 })
+      end
     end,
     browser = act('browser'),
     yank_key = act('yank_key'),

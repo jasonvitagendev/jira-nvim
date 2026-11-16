@@ -78,6 +78,7 @@ Common edits are single keys. Everything else sits behind `\` (Vim's default `<L
 | `N` | New task / epic / initiative | `D` | Set epic due date to the latest task due date |
 | `o` / `O` | Cycle sort / reverse | `f` / `F` | Filter / clear |
 | `H` | Hide done | `T` | Timeline |
+| `zw` | Wide columns (full text, scroll with `zl` `zh`) | | |
 | `za` `zM` `zR` | Fold groups | `u` | Undo last change |
 | `yy` `yu` `yb` | Copy key / URL / branch name | | |
 
