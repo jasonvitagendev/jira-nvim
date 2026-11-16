@@ -10,6 +10,7 @@ local config = require('jira.config')
 local dates = require('jira.dates')
 local hl = require('jira.ui.hl')
 local keys = require('jira.ui.keys')
+local prefs = require('jira.prefs')
 local r = require('jira.ui.render')
 local store = require('jira.ui.store')
 
@@ -978,9 +979,14 @@ function M.open(view, win)
   vim.api.nvim_buf_set_name(buf, name)
   vim.bo[buf].filetype = 'jira'
   vim.bo[buf].bufhidden = 'hide'
+  local wide = prefs.wide(name)
+  if wide == nil then
+    wide = config.wide_columns or false
+  end
   st = {
     buf = buf,
     view = view,
+    wide = wide,
     items = {},
     row_items = {},
     header_rows = {},
@@ -989,7 +995,6 @@ function M.open(view, win)
     sort = 'rank',
     group = view.group or 'none',
     hide_done = config.hide_done,
-    wide = config.wide_columns,
     back = prev,
   }
   local saved = cache_id(view) and cache.get(cache_id(view))
@@ -1181,6 +1186,12 @@ function M.open(view, win)
     end,
     wide = function()
       st.wide = not st.wide
+      -- remembered for this grid only; matching the config default means nothing to remember
+      if st.wide == (config.wide_columns or false) then
+        prefs.set_wide(name, nil)
+      else
+        prefs.set_wide(name, st.wide)
+      end
       draw(st)
       if not st.wide then
         vim.fn.winrestview({ leftcol = 0 })

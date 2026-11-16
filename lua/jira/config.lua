@@ -31,7 +31,8 @@ M.defaults = {
   hide_done = false,
   -- Done rows go to the bottom of the grid, below the open ones, whatever the sort.
   done_last = true,
-  -- Grid columns show their full text (the window scrolls sideways) instead of fitting the window. Toggle with zw.
+  -- Grid columns show their full text (the window scrolls sideways) instead of fitting the window.
+  -- zw toggles it per grid, and each grid remembers its own choice.
   wide_columns = false,
   max_results = 300,
   sidebar_width = 44,

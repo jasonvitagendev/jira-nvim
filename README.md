@@ -78,7 +78,7 @@ Common edits are single keys. Everything else sits behind `\` (Vim's default `<L
 | `N` | New task / epic / initiative | `D` | Set epic due date to the latest task due date |
 | `o` / `O` | Cycle sort / reverse | `f` / `F` | Filter / clear |
 | `H` | Hide done | `T` | Timeline |
-| `zw` | Wide columns (full text, scroll with `zl` `zh`) | | |
+| `zw` | Wide columns (full text, scroll with `zl` `zh`), remembered per grid | | |
 | `\m` | Move a column (pick it, then where it goes) | | |
 | `za` `zM` `zR` | Fold groups | `u` | Undo last change |
 | `yy` `yu` `yb` | Copy key / URL / branch name | | |
@@ -262,6 +262,7 @@ Neovim ── curl (config on stdin) ──▶ mcp.atlassian.com/v2/mcp ──�
 - **Tokens:** never on a command line (curl and `security` read them from stdin), never written to disk in plain text, and only sent over HTTPS.
 - **Login callback:** listens on `127.0.0.1` only and accepts a single request carrying the expected `state`.
 - **Local files:** `stdpath('data')/jira-nvim` (mode 0700) holds the client id, the chosen site and field ids. No secrets.
+- **Grid settings:** `prefs.json` (mode 0600) remembers which grids you made wide with `zw`, by epic key or view name.
 - **Saved lists:** `views-<site>.json` (mode 0600) holds the sidebar lists: keys, summaries, statuses, assignees and dates. No descriptions or comments. `:Jira logout` deletes it, and `offline_cache = false` stops writing it.
 - **Web links:** only `http(s)` links open from the detail view.
 
