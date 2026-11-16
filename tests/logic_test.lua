@@ -122,6 +122,12 @@ local place = require('jira.ui.grid')._place
 eq('column after another', place({ 'key', 'summary', 'assignee', 'status' }, 'status', 'summary'), { 'key', 'summary', 'status', 'assignee' })
 eq('column to the right', place({ 'key', 'summary', 'status' }, 'key', 'status'), { 'summary', 'status', 'key' })
 eq('column first', place({ 'key', 'summary', 'status' }, 'status', nil), { 'status', 'key', 'summary' })
+local saved_order = require('jira.ui.grid')._saved_order
+eq('no saved order', saved_order(nil, { 'key', 'summary' }), { 'key', 'summary' })
+eq('saved order wins', saved_order({ 'summary', 'key' }, { 'key', 'summary' }), { 'summary', 'key' })
+eq('saved order drops unknown', saved_order({ 'bogus', 'summary', 'key', 'key' }, { 'key', 'summary' }), { 'summary', 'key' })
+eq('saved order keeps epic', saved_order({ 'parent', 'key' }, { 'key' }), { 'parent', 'key' })
+eq('new config column goes last', saved_order({ 'summary', 'key' }, { 'key', 'due', 'summary' }), { 'summary', 'key', 'due' })
 
 -- done rows sink -------------------------------------------------------------------------
 local visible = require('jira.ui.grid')._visible

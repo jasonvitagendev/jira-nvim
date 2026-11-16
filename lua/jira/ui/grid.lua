@@ -221,17 +221,35 @@ local function rows_are_parents(st)
   return st.view.kind == 'epics' or st.child_parents
 end
 
-local order = {} -- 'tasks' | 'epics' -> column names, once a column was moved (this session)
-local order_rev = 0
+local order_rev = 0 -- bumped on every move, so other open grids redraw with the new order
 
 -- Lists that mix epics get an Epic column.
 local function mixed(st)
   return st.view.kind == 'tasks' or st.view.kind == 'sprint'
 end
 
+-- Saved order checked against the config: unknown names drop out, columns added to the config since go last.
+local function saved_order(saved, base)
+  if not saved then
+    return vim.deepcopy(base)
+  end
+  local out, seen = {}, {}
+  for _, n in ipairs(saved) do
+    if not seen[n] and (n == 'parent' or vim.tbl_contains(base, n)) then
+      out[#out + 1], seen[n] = n, true
+    end
+  end
+  for _, n in ipairs(base) do
+    if not seen[n] then
+      out[#out + 1] = n
+    end
+  end
+  return out
+end
+
 local function all_columns(st)
   local kind = rows_are_parents(st) and 'epics' or 'tasks'
-  local list = vim.deepcopy(order[kind] or config.columns[kind])
+  local list = saved_order(prefs.order(kind), config.columns[kind])
   if mixed(st) and not vim.tbl_contains(list, 'parent') then
     list[#list + 1] = 'parent'
   end
@@ -875,16 +893,16 @@ local function fold(st, which, all)
   draw(st)
 end
 
--- Ask which column to move and where to. The new order applies to every grid with the same kind of rows.
+-- Ask which column to move and where to. The new order applies to every grid with the same kind of rows, and is remembered.
 local function move_column(st)
   local cols = st.cols or {}
   local full, kind = all_columns(st)
   local labels = vim.tbl_map(column_label, cols)
-  if order[kind] then
+  if prefs.order(kind) then
     labels[#labels + 1] = 'Reset to the configured order'
   end
   local function apply(list)
-    order[kind] = list
+    prefs.set_order(kind, list)
     order_rev = order_rev + 1
     draw(st)
   end
@@ -1256,5 +1274,6 @@ end
 M._draw = draw
 M._visible = visible
 M._place = place
+M._saved_order = saved_order
 
 return M

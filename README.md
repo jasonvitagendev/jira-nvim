@@ -79,7 +79,7 @@ Common edits are single keys. Everything else sits behind `\` (Vim's default `<L
 | `o` / `O` | Cycle sort / reverse | `f` / `F` | Filter / clear |
 | `H` | Hide done | `T` | Timeline |
 | `zw` | Wide columns (full text, scroll with `zl` `zh`), remembered per grid | | |
-| `\m` | Move a column (pick it, then where it goes) | | |
+| `\m` | Move a column (pick it, then where it goes), remembered for all task or epic grids | | |
 | `za` `zM` `zR` | Fold groups | `u` | Undo last change |
 | `yy` `yu` `yb` | Copy key / URL / branch name | | |
 
@@ -237,7 +237,7 @@ require('jira').setup({
   due_soon_days = 3,
   hide_done = false,
   done_last = true,                          -- done rows at the bottom, open rows keep the sort (false = Jira rank only)
-  columns = { tasks = { 'key', 'summary', 'status', 'assignee', 'due' } }, -- grid columns in order (`\m` moves one until you quit)
+  columns = { tasks = { 'key', 'summary', 'status', 'assignee', 'due' } }, -- grid columns in order (`\m` moves one and remembers it)
   prefix = '\\',                             -- for \f, \x, \w, … ('<prefix>' in keymaps below)
   keymaps = { grid = { move_down = '<C-j>', move_up = '<C-k>' } }, -- false disables a key
   offline_cache = true,                      -- show the last lists at once, refresh in the background
@@ -262,7 +262,7 @@ Neovim ── curl (config on stdin) ──▶ mcp.atlassian.com/v2/mcp ──�
 - **Tokens:** never on a command line (curl and `security` read them from stdin), never written to disk in plain text, and only sent over HTTPS.
 - **Login callback:** listens on `127.0.0.1` only and accepts a single request carrying the expected `state`.
 - **Local files:** `stdpath('data')/jira-nvim` (mode 0700) holds the client id, the chosen site and field ids. No secrets.
-- **Grid settings:** `prefs.json` (mode 0600) remembers which grids you made wide with `zw`, by epic key or view name.
+- **Grid settings:** `prefs.json` (mode 0600) remembers which grids you made wide with `zw` (by epic key or view name) and the column order from `\m`.
 - **Saved lists:** `views-<site>.json` (mode 0600) holds the sidebar lists: keys, summaries, statuses, assignees and dates. No descriptions or comments. `:Jira logout` deletes it, and `offline_cache = false` stops writing it.
 - **Web links:** only `http(s)` links open from the detail view.
 
