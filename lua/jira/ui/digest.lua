@@ -2,6 +2,7 @@
 -- and changes to the epic's own dates and status. Drawn as markdown so `Y` copies it ready to paste.
 local a = require('jira.async')
 local api = require('jira.api')
+local bufs = require('jira.ui.bufs')
 local checks = require('jira.checks')
 local config = require('jira.config')
 local dates = require('jira.dates')
@@ -198,7 +199,7 @@ function M.open(days, win)
   win = win or vim.api.nvim_get_current_win()
   days = days or config.digest.days
   local name = 'jira://digest'
-  local buf = vim.fn.bufnr(name)
+  local buf = bufs.find(name)
   local prev = vim.api.nvim_win_get_buf(win)
   local st = buf ~= -1 and M.states[buf] or nil
   if st then
@@ -210,8 +211,7 @@ function M.open(days, win)
     end
     return st
   end
-  buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_name(buf, name)
+  buf = bufs.scratch(name)
   vim.bo[buf].filetype = 'markdown'
   vim.bo[buf].bufhidden = 'hide'
   st = { buf = buf, days = days, back = prev }

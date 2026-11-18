@@ -1,12 +1,13 @@
 -- Scratch buffers you edit and `:w` to send to Jira (descriptions, comments, new issues).
 local a = require('jira.async')
+local bufs = require('jira.ui.bufs')
 
 local M = {}
 
 -- opts: name, lines, filetype, title, save (coroutine fn(lines, buf)), after (fn()), on_open (fn(buf, win))
 function M.open(opts)
   local name = 'jira://' .. opts.name
-  local existing = vim.fn.bufnr(name)
+  local existing = bufs.find(name)
   if existing ~= -1 then
     local win = vim.fn.bufwinid(existing)
     if win ~= -1 then

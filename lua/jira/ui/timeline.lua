@@ -4,6 +4,7 @@
 --                  └ green = share done      ● = today
 local a = require('jira.async')
 local actions = require('jira.ui.actions')
+local bufs = require('jira.ui.bufs')
 local checks = require('jira.checks')
 local config = require('jira.config')
 local dates = require('jira.dates')
@@ -222,7 +223,7 @@ end
 function M.open(view, win)
   win = win or vim.api.nvim_get_current_win()
   local name = 'jira://timeline/' .. (view.kind == 'epic' and view.key or view.name)
-  local buf = vim.fn.bufnr(name)
+  local buf = bufs.find(name)
   local prev = vim.api.nvim_win_get_buf(win)
   local st = buf ~= -1 and M.states[buf] or nil
   if st then
@@ -231,8 +232,7 @@ function M.open(view, win)
     M.load(st)
     return st
   end
-  buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_name(buf, name)
+  buf = bufs.scratch(name)
   vim.bo[buf].filetype = 'jira'
   vim.bo[buf].bufhidden = 'hide'
   st = { buf = buf, view = view, rows = {}, back = prev }

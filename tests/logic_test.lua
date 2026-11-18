@@ -186,5 +186,20 @@ eq('digest', out, {
   '- P-9 Quiet one',
 })
 
+-- named buffers -----------------------------------------------------------------
+local bufs = require('jira.ui.bufs')
+local long = bufs.scratch('jira://epic/P-123')
+eq('find is exact, not a partial match', bufs.find('jira://epic/P-12'), -1)
+eq('find returns the named buffer', bufs.find('jira://epic/P-123'), long)
+
+-- what a session restore leaves behind: a plain listed buffer from `:edit jira://…`, shown in a split
+vim.cmd.edit('jira://epic/P-7')
+local stray = vim.api.nvim_get_current_buf()
+vim.cmd.split()
+local adopted = bufs.scratch('jira://epic/P-7')
+eq('stray buffer is taken over', adopted, stray)
+eq('both windows stay open', #vim.api.nvim_list_wins(), 2)
+eq('taken-over buffer is scratch', { vim.bo[adopted].buftype, vim.bo[adopted].buflisted }, { 'nofile', false })
+
 print(fails == 0 and 'logic: all passed' or ('logic: ' .. fails .. ' failed'))
 os.exit(fails == 0 and 0 or 1)

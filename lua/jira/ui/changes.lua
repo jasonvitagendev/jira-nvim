@@ -1,6 +1,7 @@
 -- "What changed": field changes and comments on a parent and its children since N days ago. Good for standup.
 local a = require('jira.async')
 local api = require('jira.api')
+local bufs = require('jira.ui.bufs')
 local config = require('jira.config')
 local keys = require('jira.ui.keys')
 local r = require('jira.ui.render')
@@ -148,7 +149,7 @@ end
 function M.open(key, win)
   win = win or vim.api.nvim_get_current_win()
   local name = 'jira://changes/' .. key
-  local buf = vim.fn.bufnr(name)
+  local buf = bufs.find(name)
   local prev = vim.api.nvim_win_get_buf(win)
   local st = buf ~= -1 and M.states[buf] or nil
   if st then
@@ -157,8 +158,7 @@ function M.open(key, win)
     M.load(st)
     return st
   end
-  buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_name(buf, name)
+  buf = bufs.scratch(name)
   vim.bo[buf].filetype = 'jira'
   vim.bo[buf].bufhidden = 'hide'
   st = { buf = buf, key = key, days = 1, rows = {}, groups = {}, back = prev }

@@ -4,6 +4,7 @@
 local a = require('jira.async')
 local actions = require('jira.ui.actions')
 local api = require('jira.api')
+local bufs = require('jira.ui.bufs')
 local cache = require('jira.cache')
 local checks = require('jira.checks')
 local config = require('jira.config')
@@ -980,7 +981,7 @@ end
 function M.open(view, win)
   win = win or vim.api.nvim_get_current_win()
   local name = buf_name(view)
-  local buf = vim.fn.bufnr(name)
+  local buf = bufs.find(name)
   local st = buf ~= -1 and M.states[buf] or nil
   local prev = vim.api.nvim_win_get_buf(win)
   if st then
@@ -993,8 +994,7 @@ function M.open(view, win)
     end
     return st
   end
-  buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_name(buf, name)
+  buf = bufs.scratch(name)
   vim.bo[buf].filetype = 'jira'
   vim.bo[buf].bufhidden = 'hide'
   local wide = prefs.wide(name)

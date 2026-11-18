@@ -2,6 +2,7 @@
 local a = require('jira.async')
 local actions = require('jira.ui.actions')
 local api = require('jira.api')
+local bufs = require('jira.ui.bufs')
 local cache = require('jira.cache')
 local config = require('jira.config')
 local dates = require('jira.dates')
@@ -291,8 +292,7 @@ end
 
 function M.open_in(win)
   if not (st.buf and vim.api.nvim_buf_is_valid(st.buf)) then
-    st.buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_buf_set_name(st.buf, 'jira://sidebar')
+    st.buf = bufs.scratch('jira://sidebar')
     vim.bo[st.buf].filetype = 'jira'
     vim.bo[st.buf].bufhidden = 'hide'
     local saved_site = api.site_cached()
