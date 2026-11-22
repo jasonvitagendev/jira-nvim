@@ -258,7 +258,7 @@ Neovim ── curl (config on stdin) ──▶ mcp.atlassian.com/v2/mcp ──�
    └─ OAuth tokens ─▶ macOS Keychain (service "jira.nvim")
 ```
 
-- **Server:** Atlassian's MCP server, with OAuth 2.1 (PKCE and dynamic client registration). This came from `spike/auth_spike.lua`.
+- **Server:** Atlassian's MCP server, with OAuth 2.1 (PKCE and dynamic client registration).
 - **Tokens:** never on a command line (curl and `security` read them from stdin), never written to disk in plain text, and only sent over HTTPS.
 - **Login callback:** listens on `127.0.0.1` only and accepts a single request carrying the expected `state`.
 - **Local files:** `stdpath('data')/jira-nvim` (mode 0700) holds the client id, the chosen site and field ids. No secrets.

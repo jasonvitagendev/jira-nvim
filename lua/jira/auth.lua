@@ -1,4 +1,4 @@
--- OAuth 2.1 (PKCE + dynamic client registration) against Atlassian's MCP server, from spike/auth_spike.lua.
+-- OAuth 2.1 (PKCE + dynamic client registration) against Atlassian's MCP server.
 local a = require('jira.async')
 local http = require('jira.http')
 local keychain = require('jira.keychain')
