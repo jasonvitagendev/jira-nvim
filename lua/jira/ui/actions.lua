@@ -203,6 +203,28 @@ function ops.assign_me()
   return assign_apply(api.me()), 'assigned to you'
 end
 
+-- A toggle: unwatch when you already watch every one, else watch the rest.
+function ops.watch(items)
+  local watched = api.watched(vim.tbl_map(function(it)
+    return it.key
+  end, items))
+  local all = true
+  for _, it in ipairs(items) do
+    all = all and watched[it.key] == true
+  end
+  local action, reverse = all and 'unwatch' or 'watch', all and 'watch' or 'unwatch'
+  return function(it)
+    if action == 'watch' and watched[it.key] then
+      return function() end
+    end
+    api.watch(it.key, action)
+    return function()
+      api.watch(it.key, reverse)
+    end
+  end,
+    all and 'unwatched' or 'watched'
+end
+
 function ops.assign(items)
   local first = items[1]
   local q = input({ prompt = 'Assign to (name or email, empty = list all): ' })
@@ -624,7 +646,7 @@ local function one(ctx)
   return { ctx.item or { key = ctx.key } }
 end
 
-for _, name in ipairs({ 'status', 'assign_me', 'assign', 'summary', 'move_epic', 'priority', 'labels', 'sprint', 'link', 'points', 'start_work' }) do
+for _, name in ipairs({ 'status', 'assign_me', 'assign', 'summary', 'move_epic', 'priority', 'labels', 'sprint', 'link', 'points', 'start_work', 'watch' }) do
   M[name] = function(ctx)
     M.op(name, one(ctx), ctx.refresh)
   end

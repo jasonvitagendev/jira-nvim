@@ -1108,6 +1108,7 @@ function M.open(view, win)
     priority = op('priority'),
     points = op('points'),
     start_work = op('start_work'),
+    watch = op('watch'),
     log_work = act('log_work'),
     labels = op('labels'),
     sprint = op('sprint'),

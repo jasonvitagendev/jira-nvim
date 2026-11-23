@@ -86,18 +86,19 @@ Common edits are single keys. Everything else sits behind `\` (Vim's default `<L
 | Key | Action | Key | Action |
 | --- | --- | --- | --- |
 | `\w` | Start work | `\t` | Log time |
+| `\W` | Watch / unwatch | | |
 | `\S` | Move to the active sprint | `\l` | Link (blocks, relates, …) |
 | `\g` | Group by status / assignee | `\c` | What changed |
 | `\s` | Sprint view | `\d` | Weekly digest |
 | `\f` | Find any issue | `\x` | Open in browser |
 | `\b` | Hide / show sidebar | `<C-h>` | Focus sidebar (shows it if hidden) |
 
-- **Several rows at once:** select rows with `V`, then press `s`, `m`, `@`, `!`, `#`, `L`, `E`, `ds`, `dd`, `\S`, `\l` or `\w`. You're asked once and the change goes to every row. With dates, `++1w` pushes each row out from its own date.
+- **Several rows at once:** select rows with `V`, then press `s`, `m`, `@`, `!`, `#`, `L`, `E`, `ds`, `dd`, `\S`, `\l`, `\w` or `\W`. You're asked once and the change goes to every row. With dates, `++1w` pushes each row out from its own date.
 - **Epic header:** on the lines at the top of the grid, `ds`, `dd`, `s`, `e` and `c` apply to the epic itself.
 
 **Detail**: same edit keys. `e` on a comment edits it, `R` replies to it (as a quoted comment), and `@` in a comment opens a people picker. `]]` / `[[` jump between sections and comments, `\p` goes to the parent, `<BS>` goes back. Sections and comments fold with `za` `zo` `zc` `zM` `zR`. On a web link, `<CR>` or `\x` opens it.
 
-**Sidebar**: `<CR>` opens, `<Tab>` or `za` folds a section (`zo` `zc` `zM` `zR` too, and opening loads it), `]]` / `[[` jump between epics, `/` searches, `\f` finds, `\i` opens a key, `T` opens a timeline, `\s` / `\d` open the sprint / digest, `a` / `P` / `N` create, `ds` / `dd` / `s` work on the epic under the cursor.
+**Sidebar**: `<CR>` opens, `<Tab>` or `za` folds a section (`zo` `zc` `zM` `zR` too, and opening loads it), `]]` / `[[` jump between epics, `/` searches, `\f` finds, `\i` opens a key, `T` opens a timeline, `\s` / `\d` open the sprint / digest, `a` / `P` / `N` create, `ds` / `dd` / `s` / `\W` work on the epic under the cursor.
 
 The grid turns folding off, so a global `foldmethod=indent` (LazyVim's default) can't fold the table.
 

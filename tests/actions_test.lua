@@ -94,5 +94,31 @@ actions.log_work({ key = 'P-5' }, 'soon', '')
 settle()
 eq('log work bad time sends nothing', calls, {})
 
+-- watch: a mixed selection watches only the unwatched row; undo unwatches just that one
+local watching = { ['P-6'] = true }
+api.watched = function()
+  return vim.deepcopy(watching)
+end
+api.watch = function(key, action)
+  log(action, key)
+  watching[key] = action == 'watch' or nil
+end
+calls = {}
+actions.op('watch', { { key = 'P-6' }, { key = 'P-7' } })
+settle()
+eq('watch mixed', calls, { 'watch P-7' })
+calls = {}
+actions.undo()
+settle()
+eq('watch undo', calls, { 'unwatch P-7' })
+
+-- watch: when every row is watched, the same key unwatches them all
+watching = { ['P-6'] = true, ['P-7'] = true }
+calls = {}
+actions.op('watch', { { key = 'P-6' }, { key = 'P-7' } })
+settle()
+table.sort(calls)
+eq('unwatch all', calls, { 'unwatch P-6', 'unwatch P-7' })
+
 print(fails == 0 and 'actions: all passed' or ('actions: ' .. fails .. ' failed'))
 os.exit(fails == 0 and 0 or 1)

@@ -408,6 +408,9 @@ function M.open(key, win)
     start_work = function()
       actions.start_work(ctx())
     end,
+    watch = function()
+      actions.watch(ctx())
+    end,
     log_work = function()
       actions.log_work(ctx())
     end,

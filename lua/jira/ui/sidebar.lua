@@ -365,6 +365,9 @@ function M.open_in(win)
       status = with_item(function(it)
         actions.status(ctx(it))
       end),
+      watch = with_item(function(it)
+        actions.watch(ctx(it))
+      end),
       start = with_item(function(it)
         actions.date(ctx(it), 'start')
       end),

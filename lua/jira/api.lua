@@ -578,6 +578,27 @@ function M.set_labels(key, labels)
   return M.edit(key, { labels = labels })
 end
 
+-- action = 'watch' | 'unwatch'. Always acts on you.
+function M.watch(key, action)
+  return op('executeWrite', 'watchJiraIssue', { issueIdOrKey = key, action = action })
+end
+
+-- The keys you watch, as a set. The MCP drops fields.watches, so JQL answers instead.
+function M.watched(keys)
+  keys = vim.tbl_filter(function(k)
+    return k:match('^%u[%u%d_]*%-%d+$') ~= nil
+  end, keys)
+  local set = {}
+  if #keys == 0 then
+    return set
+  end
+  local jql = ('key in (%s) AND watcher = currentUser()'):format(table.concat(keys, ','))
+  for _, raw in ipairs(M.search(jql, { fields = { 'summary' }, raw = true, limit = #keys })) do
+    set[raw.key] = true
+  end
+  return set
+end
+
 -- Any user on the site (for @mentions), not only people assignable to an issue.
 function M.find_users(query)
   local res = op('executeRead', 'lookupJiraAccountId', { query = query, maxResults = 20 })
